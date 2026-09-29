@@ -89,11 +89,19 @@ function highlight(code: string, lang: string): string {
 
 export function CodeBlock({ language = "bash", filename, children }: CodeBlockProps) {
   const [copied, setCopied] = useState(false);
+  const copyTimerRef = React.useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  React.useEffect(() => {
+    return () => {
+      if (copyTimerRef.current) clearTimeout(copyTimerRef.current);
+    };
+  }, []);
 
   const handleCopy = useCallback(() => {
     copyToClipboard(children).then(() => {
       setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
+      if (copyTimerRef.current) clearTimeout(copyTimerRef.current);
+      copyTimerRef.current = setTimeout(() => setCopied(false), 2000);
     });
   }, [children]);
 

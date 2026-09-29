@@ -77,6 +77,11 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🔴</text></svg>" />
       </head>
       <body style={{ minHeight: "100vh", display: "flex", flexDirection: "column" }}>
+        {/* Skip to Content for Keyboard Accessibility */}
+        <a href="#main-content" className="skip-link">
+          Skip to main content
+        </a>
+
         {/* Site Header */}
         <header className="site-header">
           <a href="#what-were-building" className="site-logo" aria-label="Go to beginning of tutorial">

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 
 const sections = [
   { id: "what-were-building", label: "What We're Building", num: "01" },
@@ -20,6 +20,27 @@ const sections = [
 export function MobileMenu() {
   const [open, setOpen] = useState(false);
 
+  useEffect(() => {
+    if (open) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "";
+    }
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [open]);
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape" && open) {
+        setOpen(false);
+      }
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [open]);
+
   const handleNav = (id: string) => {
     setOpen(false);
     document.getElementById(id)?.scrollIntoView({ behavior: "smooth", block: "start" });
@@ -30,10 +51,9 @@ export function MobileMenu() {
       <button
         className="mobile-nav-btn"
         onClick={() => setOpen(!open)}
-        aria-label="Toggle navigation menu"
+        aria-label={open ? "Close navigation menu" : "Open navigation menu"}
         aria-expanded={open}
         style={{
-          display: "flex",
           width: "36px",
           height: "36px",
           borderRadius: "var(--radius-md)",

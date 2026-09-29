@@ -1213,23 +1213,53 @@ input:focus-visible {
   border-radius: var(--radius-sm);
 }
 
-/* Touch targets — minimum 44px for mobile */
+/* Skip to content link for keyboard accessibility */
+.skip-link {
+  position: absolute;
+  top: -100px;
+  left: 1rem;
+  background: var(--keploy-orange);
+  color: #ffffff;
+  padding: 0.5rem 1rem;
+  border-radius: var(--radius-md);
+  z-index: 100;
+  font-weight: 600;
+  text-decoration: none;
+  transition: top 200ms ease;
+}
+.skip-link:focus {
+  top: 1rem;
+}
+
+/* Touch targets — minimum 44px for standalone mobile controls (excluding inline text links) */
 @media (max-width: 900px) {
-  button, a {
+  .mobile-nav-btn,
+  .theme-toggle,
+  .nav-item,
+  .site-logo,
+  button:not(.copy-btn):not(.progress-reset-btn) {
     min-height: 44px;
   }
-  .nav-item { min-height: 44px; }
   .copy-btn { min-height: 32px; }
 }
 
-/* Horizontal scroll for code blocks on mobile */
+/* Horizontal scroll & padding for code blocks on mobile */
 @media (max-width: 640px) {
   .code-block-content {
     font-size: 0.8125rem;
+    padding: 0.875rem 1rem;
   }
   pre {
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
+  }
+  .hero-flow {
+    padding: 1rem;
+  }
+  .file-tree {
+    padding: 1rem;
+    font-size: 0.8125rem;
+    overflow-x: auto;
   }
 }
 

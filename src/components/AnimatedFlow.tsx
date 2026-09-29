@@ -67,12 +67,14 @@ export function AnimatedFlow() {
         background: "var(--bg-card)",
         border: "1px solid var(--bg-border)",
         borderRadius: "var(--radius-xl)",
-        padding: "2rem",
+        padding: "1.25rem",
         margin: "2rem 0",
+        maxWidth: "100%",
+        overflowX: "hidden",
       }}
     >
       {/* Header */}
-      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "1.75rem" }}>
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "1.75rem", flexWrap: "wrap", gap: "0.75rem" }}>
         <div>
           <div style={{ fontSize: "0.6875rem", fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", color: "var(--text-muted)", marginBottom: "0.25rem" }}>
             How Keploy Works
@@ -121,6 +123,7 @@ export function AnimatedFlow() {
           flexDirection: "column",
           alignItems: "center",
           gap: 0,
+          width: "100%",
         }}
       >
         <FlowNode label="curl / HTTP client" sublabel="sends request" active={isActive("request")} color="indigo" />
@@ -134,11 +137,11 @@ export function AnimatedFlow() {
             display: "flex",
             flexDirection: "column",
             alignItems: "center",
-            padding: "0.875rem 1.75rem",
+            padding: "0.875rem 1.25rem",
             borderRadius: "var(--radius-lg)",
             border: `2px solid ${isActive("intercept") ? "var(--keploy-orange)" : "var(--bg-border)"}`,
             background: isActive("intercept") ? "var(--keploy-glow)" : "var(--bg-elevated)",
-            minWidth: "200px",
+            maxWidth: "100%",
             textAlign: "center",
             transition: "all 400ms ease",
             boxShadow: isActive("intercept") ? "0 0 24px rgba(249,115,22,0.2)" : "none",
@@ -157,7 +160,9 @@ export function AnimatedFlow() {
             <div
               style={{
                 display: "flex",
-                gap: "0.5rem",
+                flexWrap: "wrap",
+                justifyContent: "center",
+                gap: "0.375rem",
                 marginTop: "0.875rem",
                 animation: "fade-up 0.4s ease both",
               }}
@@ -172,7 +177,7 @@ export function AnimatedFlow() {
         <FlowArrow active={isActive("capture")} split />
 
         {/* Side-by-side: Test + Mapping */}
-        <div style={{ display: "flex", gap: "1rem", justifyContent: "center" }}>
+        <div style={{ display: "flex", flexWrap: "wrap", gap: "0.75rem", justifyContent: "center", width: "100%" }}>
           <SideNode
             label="Test Case YAML"
             sublabel="get-all-1.yaml"
@@ -194,7 +199,7 @@ export function AnimatedFlow() {
         {/* Pass */}
         <div
           style={{
-            padding: "0.875rem 2rem",
+            padding: "0.875rem 1.5rem",
             borderRadius: "var(--radius-lg)",
             border: `2px solid ${isActive("pass") ? "rgba(34,197,94,0.4)" : "var(--bg-border)"}`,
             background: isActive("pass") ? "rgba(34,197,94,0.08)" : "var(--bg-elevated)",

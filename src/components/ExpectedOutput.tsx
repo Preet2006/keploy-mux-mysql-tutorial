@@ -35,6 +35,9 @@ export function ExpectedOutput({ lines, label = "Expected Output" }: ExpectedOut
           fontFamily: "var(--font-mono)",
           fontSize: "0.8125rem",
           lineHeight: 1.7,
+          overflowX: "auto",
+          WebkitOverflowScrolling: "touch",
+          maxWidth: "100%",
         }}
       >
         {lines.map((line, i) => {
