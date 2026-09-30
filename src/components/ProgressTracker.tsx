@@ -22,6 +22,7 @@ export function ProgressTracker() {
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- mount-gate to avoid SSR/client mismatch, intentional
     setMounted(true);
     try {
       const saved = localStorage.getItem(STORAGE_KEY);
@@ -81,7 +82,7 @@ export function ProgressTracker() {
         </div>
         <div style={{ display: "flex", alignItems: "center", gap: "0.75rem" }}>
           {count === total && (
-            <span style={{ fontSize: "0.75rem", color: "#4ade80", fontWeight: 700 }}>🎉 Done!</span>
+            <span style={{ fontSize: "0.75rem", color: "#4ade80", fontWeight: 700 }}>Complete</span>
           )}
           <button
             onClick={reset}

@@ -44,7 +44,6 @@ export function TroubleshootCard({ item }: TroubleshootCardProps) {
           fontFamily: "var(--font-sans)",
         }}
       >
-        <span style={{ fontSize: "1rem", flexShrink: 0 }} aria-hidden="true">⚠️</span>
         <span style={{ fontWeight: 600, fontSize: "0.9375rem", color: "var(--text-primary)", flex: 1 }}>
           {item.problem}
         </span>
@@ -97,12 +96,12 @@ export function TroubleshootCard({ item }: TroubleshootCardProps) {
           {item.expected && (
             <div style={{ marginTop: "0.75rem" }}>
               <div style={{ fontSize: "0.6875rem", fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase", color: "var(--text-muted)", marginBottom: "0.375rem" }}>
-                Expected Output
+                What Should Happen
               </div>
               <div
                 style={{
-                  fontFamily: "var(--font-mono)",
                   fontSize: "0.8125rem",
+                  lineHeight: 1.6,
                   color: "#86efac",
                   background: "rgba(34,197,94,0.05)",
                   border: "1px solid rgba(34,197,94,0.1)",

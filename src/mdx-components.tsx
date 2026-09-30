@@ -3,7 +3,6 @@ import { Callout } from "@/components/Callout";
 import { Step } from "@/components/Step";
 import { CodeBlock } from "@/components/CodeBlock";
 import { TestResult } from "@/components/TestResult";
-import { ArchitectureDiagram } from "@/components/ArchitectureDiagram";
 import { StatusCard } from "@/components/StatusCard";
 import { CommandComparison } from "@/components/CommandComparison";
 import { InfoCard, InfoCardGrid } from "@/components/InfoCard";
@@ -64,7 +63,6 @@ export function useMDXComponents(components: MDXComponents): MDXComponents {
     Step,
     CodeBlock,
     TestResult,
-    ArchitectureDiagram,
     StatusCard,
     CommandComparison,
     InfoCard,

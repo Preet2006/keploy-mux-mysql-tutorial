@@ -59,20 +59,13 @@ export function Sidebar() {
       >
         <div
           style={{
-            width: "28px",
-            height: "28px",
+            width: "22px",
+            height: "22px",
             borderRadius: "6px",
-            background: "var(--keploy-glow)",
-            border: "1px solid var(--bg-border-accent)",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            fontSize: "0.875rem",
+            background: "var(--keploy-orange)",
           }}
           aria-hidden="true"
-        >
-          🔴
-        </div>
+        />
         <span style={{ fontWeight: 700, fontSize: "0.875rem", color: "var(--text-primary)" }}>
           Keploy Tutorial
         </span>
@@ -104,10 +97,9 @@ export function Sidebar() {
           }}
         >
           <div style={{ fontWeight: 600, color: "var(--color-success)", marginBottom: "0.25rem" }}>
-            ✓ All tests passed
+            6/6 test cases passed
           </div>
           <div>Keploy 3.8.47 · mux-mysql</div>
-          <div style={{ marginTop: "0.25rem" }}>6/6 test cases</div>
         </div>
       </div>
     </nav>

@@ -5,14 +5,16 @@ import React, { useEffect, useState } from "react";
 export function ThemeToggle() {
   const [dark, setDark] = useState(true);
 
+  // Reads the persisted theme after mount (not during the initial render) so
+  // the server-rendered markup and the first client render always match —
+  // switching state here, post-mount, is intentional to avoid a hydration mismatch.
   useEffect(() => {
-    // Check localStorage first
     const stored = localStorage.getItem("keploy-theme");
     if (stored === "light") {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setDark(false);
       document.documentElement.classList.add("light");
     } else {
-      setDark(true);
       document.documentElement.classList.remove("light");
     }
   }, []);

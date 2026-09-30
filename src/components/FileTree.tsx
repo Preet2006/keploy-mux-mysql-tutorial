@@ -21,14 +21,14 @@ function TreeNode({ node, depth }: { node: FileTreeNode; depth: number }) {
           {node.type === "dir" ? (
             <>
               <span style={{ color: "var(--text-muted)" }}>{depth > 0 ? "├── " : ""}</span>
-              <span className="file-tree-dir">📁 {node.name}/</span>
+              <span className="file-tree-dir">{node.name}/</span>
             </>
           ) : (
             <>
               <span style={{ color: "var(--text-muted)", fontFamily: "var(--font-mono)", fontSize: "0.875rem" }}>
                 {depth > 0 ? "├── " : ""}
               </span>
-              <span className="file-tree-file">📄 {node.name}</span>
+              <span className="file-tree-file">{node.name}</span>
             </>
           )}
           {node.comment && (

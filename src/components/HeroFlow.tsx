@@ -7,7 +7,7 @@ const flowNodes = [
   { label: "Keploy Records", color: "var(--keploy-glow)", border: "var(--bg-border-accent)", text: "var(--keploy-orange)" },
   { label: "Test Case + Mapping", color: "rgba(34,197,94,0.08)", border: "rgba(34,197,94,0.25)", text: "#4ade80" },
   { label: "Replay", color: "rgba(249,115,22,0.08)", border: "rgba(249,115,22,0.2)", text: "#fb923c" },
-  { label: "6/6 Passed ✓", color: "rgba(34,197,94,0.1)", border: "rgba(34,197,94,0.35)", text: "#4ade80" },
+  { label: "6/6 Passed", color: "rgba(34,197,94,0.1)", border: "rgba(34,197,94,0.35)", text: "#4ade80" },
 ];
 
 export function HeroFlow() {

@@ -25,6 +25,10 @@ function copyToClipboard(text: string): Promise<void> {
 
 function highlight(code: string, lang: string): string {
   if (lang === "bash" || lang === "sh" || lang === "shell") {
+    // Single combined-regex pass per line: matches are found against the
+    // original escaped text only, so a later alternative can never re-match
+    // HTML (e.g. the quotes in class="token-bash-cmd") injected by an earlier one.
+    const token = /(--[\w-]+=?|-[a-zA-Z]\b)|(^\s*)(keploy|go|git|docker|docker-compose|mysql|curl|npm|cd|mkdir|export|source|chmod|echo|cat|ls)(?=\s|$)|(["'`])(?:\\.|(?!\4)[^\\])*\4/g;
     return code
       .replace(/&/g, "&amp;")
       .replace(/</g, "&lt;")
@@ -34,14 +38,12 @@ function highlight(code: string, lang: string): string {
         if (line.trim().startsWith("#")) {
           return `<span class="token-comment">${line}</span>`;
         }
-        // Highlight flags
-        line = line.replace(/(--[\w-]+=?|-[a-zA-Z])\b/g, '<span class="token-bash-flag">$1</span>');
-        // Highlight command start (first word)
-        line = line.replace(/^(\s*)(keploy|go|git|docker|docker-compose|mysql|curl|npm|cd|mkdir|export|source|chmod|echo|cat|ls)(\s|$)/,
-          '$1<span class="token-bash-cmd">$2</span>$3');
-        // Highlight strings
-        line = line.replace(/(["'`])((?:\\.|(?!\1)[^\\])*)\1/g, '<span class="token-string">$1$2$1</span>');
-        return line;
+        return line.replace(token, (match, flag, cmdLead, cmd, quote) => {
+          if (flag) return `<span class="token-bash-flag">${flag}</span>`;
+          if (cmd) return `${cmdLead}<span class="token-bash-cmd">${cmd}</span>`;
+          if (quote) return `<span class="token-string">${match}</span>`;
+          return match;
+        });
       })
       .join("\n");
   }
@@ -66,15 +68,20 @@ function highlight(code: string, lang: string): string {
   }
 
   if (lang === "go") {
+    // Same single-pass rule as the bash branch above — one regex, one scan
+    // of the original text, so injected HTML is never re-matched.
+    const token = /(\/\/[^\n]*)|(["'`])(?:\\.|(?!\2)[^\\])*\2|\b(package|import|func|var|const|type|struct|interface|return|if|else|for|range|switch|case|default|defer|go|chan|select|break|continue|fallthrough|goto|map|make|new|nil|true|false|error)\b|\b(\d+)\b/g;
     return code
       .replace(/&/g, "&amp;")
       .replace(/</g, "&lt;")
       .replace(/>/g, "&gt;")
-      .replace(/\b(package|import|func|var|const|type|struct|interface|return|if|else|for|range|switch|case|default|defer|go|chan|select|break|continue|fallthrough|goto|map|make|new|nil|true|false|error)\b/g,
-        '<span class="token-keyword">$1</span>')
-      .replace(/(\/\/[^\n]*)/g, '<span class="token-comment">$1</span>')
-      .replace(/(["'`])((?:\\.|(?!\1)[^\\])*)\1/g, '<span class="token-string">$1$2$1</span>')
-      .replace(/\b(\d+)\b/g, '<span class="token-number">$1</span>');
+      .replace(token, (match, comment, quote, keyword, number) => {
+        if (comment) return `<span class="token-comment">${comment}</span>`;
+        if (quote) return `<span class="token-string">${match}</span>`;
+        if (keyword) return `<span class="token-keyword">${keyword}</span>`;
+        if (number) return `<span class="token-number">${number}</span>`;
+        return match;
+      });
   }
 
   // JSON / generic

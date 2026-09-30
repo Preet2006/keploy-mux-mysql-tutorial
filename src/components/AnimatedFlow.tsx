@@ -23,7 +23,9 @@ export function AnimatedFlow() {
   const timerIds = useRef<ReturnType<typeof setTimeout>[]>([]);
   // Ref so the finish callback reads the current loop value, not a stale closure
   const loopRef = useRef(loop);
-  loopRef.current = loop;
+  useEffect(() => {
+    loopRef.current = loop;
+  }, [loop]);
 
   const clearAllTimers = () => {
     timerIds.current.forEach(clearTimeout);
@@ -144,10 +146,9 @@ export function AnimatedFlow() {
             maxWidth: "100%",
             textAlign: "center",
             transition: "all 400ms ease",
-            boxShadow: isActive("intercept") ? "0 0 24px rgba(249,115,22,0.2)" : "none",
+            boxShadow: "none",
           }}
         >
-          <div style={{ fontSize: "1.125rem", marginBottom: "0.25rem" }} aria-hidden="true">🔴</div>
           <div style={{ fontWeight: 700, fontSize: "0.9375rem", color: isActive("intercept") ? "var(--keploy-orange)" : "var(--text-primary)" }}>
             Keploy 3.8.47
           </div>
@@ -205,7 +206,7 @@ export function AnimatedFlow() {
             background: isActive("pass") ? "rgba(34,197,94,0.08)" : "var(--bg-elevated)",
             textAlign: "center",
             transition: "all 500ms ease",
-            boxShadow: isActive("pass") ? "0 0 32px rgba(34,197,94,0.12)" : "none",
+            boxShadow: "none",
           }}
         >
           <div style={{ fontSize: isActive("pass") ? "2rem" : "1.25rem", fontFamily: "var(--font-mono)", fontWeight: 700, color: isActive("pass") ? "#4ade80" : "var(--text-muted)", transition: "all 400ms ease", lineHeight: 1 }}>

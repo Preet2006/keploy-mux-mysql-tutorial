@@ -4,31 +4,21 @@ import React from "react";
 
 interface InfoCardProps {
   title: string;
-  icon?: string;
   children: React.ReactNode;
 }
 
-export function InfoCard({ title, icon, children }: InfoCardProps) {
+export function InfoCard({ title, children }: InfoCardProps) {
   return (
     <div className="card">
       <div
         style={{
-          display: "flex",
-          alignItems: "center",
-          gap: "0.5rem",
+          fontWeight: 600,
+          fontSize: "0.9375rem",
+          color: "var(--text-primary)",
           marginBottom: "0.625rem",
         }}
       >
-        {icon && <span style={{ fontSize: "1.125rem" }} aria-hidden="true">{icon}</span>}
-        <span
-          style={{
-            fontWeight: 600,
-            fontSize: "0.9375rem",
-            color: "var(--text-primary)",
-          }}
-        >
-          {title}
-        </span>
+        {title}
       </div>
       <div style={{ fontSize: "0.875rem", color: "var(--text-secondary)", lineHeight: 1.65 }}>
         {children}

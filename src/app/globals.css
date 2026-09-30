@@ -58,7 +58,6 @@
   --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.4);
   --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.5);
   --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.6);
-  --shadow-glow: 0 0 24px rgba(249, 115, 22, 0.18);
 
   /* Sidebar */
   --sidebar-width: 260px;
@@ -433,12 +432,13 @@ body {
   display: flex;
   gap: 0.875rem;
   padding: 1rem 1.25rem;
-  border-radius: var(--radius-lg);
+  border-radius: var(--radius-md);
   margin: 1.5rem 0;
   border: 1px solid;
+  border-left-width: 3px;
 }
 
-.callout-icon { font-size: 1.125rem; flex-shrink: 0; margin-top: 0.0625rem; }
+.callout-bar { display: none; }
 
 .callout-body { flex: 1; min-width: 0; }
 .callout-title {
@@ -455,39 +455,44 @@ body {
 }
 
 .callout-info {
-  background: rgba(59, 130, 246, 0.06);
-  border-color: rgba(59, 130, 246, 0.2);
+  background: rgba(59, 130, 246, 0.05);
+  border-color: rgba(59, 130, 246, 0.16);
+  border-left-color: #60a5fa;
 }
 .callout-info .callout-title { color: #60a5fa; }
-.callout-info .callout-text { color: #93c5fd; }
+.callout-info .callout-text { color: var(--text-secondary); }
 
 .callout-tip {
-  background: rgba(249, 115, 22, 0.06);
-  border-color: rgba(249, 115, 22, 0.2);
+  background: rgba(249, 115, 22, 0.05);
+  border-color: rgba(249, 115, 22, 0.16);
+  border-left-color: var(--keploy-orange);
 }
 .callout-tip .callout-title { color: var(--keploy-orange); }
-.callout-tip .callout-text { color: #fdba74; }
+.callout-tip .callout-text { color: var(--text-secondary); }
 
 .callout-warning {
-  background: rgba(245, 158, 11, 0.06);
-  border-color: rgba(245, 158, 11, 0.2);
+  background: rgba(245, 158, 11, 0.05);
+  border-color: rgba(245, 158, 11, 0.16);
+  border-left-color: #fbbf24;
 }
 .callout-warning .callout-title { color: #fbbf24; }
-.callout-warning .callout-text { color: #fde68a; }
+.callout-warning .callout-text { color: var(--text-secondary); }
 
 .callout-success {
-  background: rgba(34, 197, 94, 0.06);
-  border-color: rgba(34, 197, 94, 0.2);
+  background: rgba(34, 197, 94, 0.05);
+  border-color: rgba(34, 197, 94, 0.16);
+  border-left-color: #4ade80;
 }
 .callout-success .callout-title { color: #4ade80; }
-.callout-success .callout-text { color: #86efac; }
+.callout-success .callout-text { color: var(--text-secondary); }
 
 .callout-error {
-  background: rgba(239, 68, 68, 0.06);
-  border-color: rgba(239, 68, 68, 0.2);
+  background: rgba(239, 68, 68, 0.05);
+  border-color: rgba(239, 68, 68, 0.16);
+  border-left-color: #f87171;
 }
 .callout-error .callout-title { color: #f87171; }
-.callout-error .callout-text { color: #fca5a5; }
+.callout-error .callout-text { color: var(--text-secondary); }
 
 /* ============================================
    STEP COMPONENT
@@ -560,7 +565,6 @@ body {
 .card:hover {
   border-color: var(--bg-border-accent);
   background: var(--bg-card-hover);
-  box-shadow: var(--shadow-glow);
 }
 
 .card-grid {
@@ -577,10 +581,9 @@ body {
 .test-result {
   background: var(--bg-card);
   border: 1px solid rgba(34, 197, 94, 0.2);
-  border-radius: var(--radius-xl);
+  border-radius: var(--radius-lg);
   padding: 2rem;
   margin: 2rem 0;
-  box-shadow: 0 0 40px rgba(34, 197, 94, 0.06);
 }
 
 .test-result-header {
@@ -642,109 +645,6 @@ body {
   font-family: var(--font-mono);
   font-weight: 600;
   color: var(--color-success);
-}
-
-/* ============================================
-   ARCHITECTURE DIAGRAM
-   ============================================ */
-
-.arch-diagram {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 0;
-  margin: 2rem 0;
-  padding: 2rem;
-  background: var(--bg-card);
-  border: 1px solid var(--bg-border);
-  border-radius: var(--radius-xl);
-}
-
-.arch-node {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  text-align: center;
-  gap: 0.5rem;
-  padding: 0.75rem 1.5rem;
-  border-radius: var(--radius-lg);
-  font-size: 0.875rem;
-  font-weight: 600;
-  border: 1px solid;
-  min-width: 180px;
-  transition: all var(--transition-base);
-}
-
-.arch-node-api {
-  background: rgba(99, 102, 241, 0.1);
-  border-color: rgba(99, 102, 241, 0.3);
-  color: #a5b4fc;
-}
-
-.arch-node-calls {
-  background: rgba(59, 130, 246, 0.08);
-  border-color: rgba(59, 130, 246, 0.2);
-  color: #93c5fd;
-}
-
-.arch-node-keploy {
-  background: var(--keploy-glow);
-  border-color: var(--bg-border-accent);
-  color: var(--keploy-orange);
-  font-size: 1rem;
-}
-
-.arch-node-split {
-  display: flex;
-  gap: 1.5rem;
-  align-items: flex-start;
-  justify-content: center;
-}
-
-.arch-node-tests {
-  background: rgba(34, 197, 94, 0.08);
-  border-color: rgba(34, 197, 94, 0.2);
-  color: #4ade80;
-  min-width: 140px;
-}
-
-.arch-node-maps {
-  background: rgba(168, 85, 247, 0.08);
-  border-color: rgba(168, 85, 247, 0.2);
-  color: #c084fc;
-  min-width: 140px;
-}
-
-.arch-node-replay {
-  background: rgba(249, 115, 22, 0.08);
-  border-color: rgba(249, 115, 22, 0.2);
-  color: #fb923c;
-}
-
-.arch-node-pass {
-  background: rgba(34, 197, 94, 0.1);
-  border-color: rgba(34, 197, 94, 0.35);
-  color: #4ade80;
-  font-size: 1rem;
-}
-
-.arch-arrow {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  height: 2rem;
-  gap: 2px;
-}
-
-.arch-arrow-line {
-  width: 1px;
-  flex: 1;
-  background: linear-gradient(to bottom, var(--bg-border-accent), rgba(249, 115, 22, 0.1));
-}
-
-.arch-arrow-head {
-  color: rgba(249, 115, 22, 0.4);
-  font-size: 0.75rem;
 }
 
 /* ============================================
@@ -876,6 +776,15 @@ body {
   font-size: 0.9375rem;
   color: var(--text-primary);
   text-decoration: none;
+  white-space: nowrap;
+  min-width: 0;
+  overflow: hidden;
+}
+
+.site-logo-text {
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
 }
 
 .logo-badge {
@@ -1108,13 +1017,15 @@ body {
   .mobile-nav-btn { display: flex; }
   .hero-title { font-size: 1.875rem; }
   .cmd-comparison { grid-template-columns: 1fr; }
-  .arch-node-split { flex-direction: column; align-items: center; }
 }
 
 @media (max-width: 640px) {
   .hero-title { font-size: 1.625rem; }
   .hero { padding: 2.5rem 0 2rem; }
   .test-result-fraction { font-size: 2.75rem; }
+  .site-header { padding: 0 1rem; }
+  .site-logo-text { display: none; }
+  .github-link-label { display: none; }
 }
 
 /* ============================================
@@ -1126,17 +1037,8 @@ body {
   to { opacity: 1; transform: translateY(0); }
 }
 
-@keyframes pulse-dot {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.4; }
-}
-
 .animate-fade-up {
   animation: fade-up 0.5s ease both;
-}
-
-.animate-pulse-dot {
-  animation: pulse-dot 2s ease-in-out infinite;
 }
 
 /* ============================================

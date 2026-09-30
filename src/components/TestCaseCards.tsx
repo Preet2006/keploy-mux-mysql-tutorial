@@ -8,6 +8,7 @@ interface TestCase {
   path: string;
   statusCode: number;
   requestBody?: string;
+  responseLabel?: string;
   responseBody: string;
   dbInteraction: string;
   description: string;
@@ -17,47 +18,43 @@ const testCases: TestCase[] = [
   {
     name: "post-create-1",
     method: "POST",
-    path: "/links",
+    path: "/create",
     statusCode: 200,
     requestBody: `{
-  "url": "https://keploy.io",
-  "custom": "keploy"
+  "link": "https://keploy.io"
 }`,
     responseBody: `{
-  "id": 1,
-  "url": "https://keploy.io",
-  "custom": "keploy"
+  "message": "Converted",
+  "link": "http://localhost:8080/links/1",
+  "status": true
 }`,
-    dbInteraction: `INSERT INTO links (url, custom) VALUES (?, ?)`,
-    description: "Creates a new short link. Keploy captures the full INSERT query and the auto-generated ID returned in the response.",
+    dbInteraction: `insert into list (website) values("https://keploy.io")`,
+    description: "Creates a new short link. Keploy captures the INSERT query and the shortened link URL returned in the response.",
   },
   {
     name: "get-all-1",
     method: "GET",
-    path: "/links",
+    path: "/all",
     statusCode: 200,
-    responseBody: `[
-  {
-    "id": 1,
-    "url": "https://keploy.io",
-    "custom": "keploy"
-  }
-]`,
-    dbInteraction: `SELECT id, url, custom FROM links`,
-    description: "Fetches all stored links. Keploy asserts the full JSON array matches — the recorded mapping provides the DB rows.",
+    responseBody: `{
+  "message": [
+    { "id": "1", "website": "https://keploy.io" }
+  ],
+  "status": true
+}`,
+    dbInteraction: `select * from list`,
+    description: "Fetches all stored links. Keploy asserts the full JSON response matches — the recorded mapping provides the DB rows.",
   },
   {
     name: "get-links-by-id-1",
     method: "GET",
     path: "/links/{id}",
-    statusCode: 200,
-    responseBody: `{
-  "id": 1,
-  "url": "https://keploy.io",
-  "custom": "keploy"
-}`,
-    dbInteraction: `SELECT id, url, custom FROM links WHERE id = ?`,
-    description: "Fetches a single link by its ID. The path parameter is part of the recorded test — replay sends the exact same ID.",
+    statusCode: 307,
+    responseLabel: "Response Headers",
+    responseBody: `HTTP/1.1 307 Temporary Redirect
+Location: https://keploy.io`,
+    dbInteraction: `select website from list where id=1`,
+    description: "Redirects to the original URL for the given ID — this handler doesn't return JSON, it issues an HTTP redirect. Keploy's test case for this asserts the status code and Location header rather than a response body.",
   },
 ];
 
@@ -144,7 +141,7 @@ export function TestCaseCards() {
                 style={{
                   fontFamily: "var(--font-mono)",
                   fontSize: "0.75rem",
-                  color: tc.statusCode < 300 ? "#4ade80" : "#f87171",
+                  color: tc.statusCode < 400 ? "#4ade80" : "#f87171",
                   marginLeft: "auto",
                   flexShrink: 0,
                 }}
@@ -199,10 +196,10 @@ export function TestCaseCards() {
 
                 <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: "0.75rem" }}>
                   {tc.requestBody && (
-                    <YamlPanel label="Request Body" lang="json" content={tc.requestBody} />
+                    <YamlPanel label="Request Body" content={tc.requestBody} />
                   )}
-                  <YamlPanel label="Response Body" lang="json" content={tc.responseBody} />
-                  <YamlPanel label="DB Interaction (mocked)" lang="sql" content={tc.dbInteraction} />
+                  <YamlPanel label={tc.responseLabel ?? "Response Body"} content={tc.responseBody} />
+                  <YamlPanel label="DB Interaction (mocked)" content={tc.dbInteraction} />
                 </div>
 
                 <div
@@ -224,7 +221,7 @@ export function TestCaseCards() {
   );
 }
 
-function YamlPanel({ label, lang, content }: { label: string; lang: string; content: string }) {
+function YamlPanel({ label, content }: { label: string; content: string }) {
   return (
     <div>
       <div

@@ -35,10 +35,8 @@ export function StatusCard({ items }: StatusCardProps) {
           <span style={{ fontSize: "0.875rem", color: "var(--text-secondary)" }}>
             {item.label}
           </span>
-          <span
-            className="status-badge status-badge-success"
-          >
-            <span className="status-badge-dot animate-pulse-dot" aria-hidden="true" />
+          <span className="status-badge status-badge-success">
+            <span className="status-badge-dot" aria-hidden="true" />
             {item.value}
           </span>
         </div>

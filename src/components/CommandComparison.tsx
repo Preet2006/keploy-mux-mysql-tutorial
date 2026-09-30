@@ -22,7 +22,7 @@ export function CommandComparison({
   return (
     <div className="cmd-comparison">
       <div className="cmd-comparison-col cmd-comparison-bad">
-        <div className="cmd-comparison-label">✗ {badLabel}</div>
+        <div className="cmd-comparison-label">{badLabel}</div>
         <div className="cmd-comparison-code">{badCommand}</div>
         {badError && (
           <div
@@ -42,7 +42,7 @@ export function CommandComparison({
         )}
       </div>
       <div className="cmd-comparison-col cmd-comparison-good">
-        <div className="cmd-comparison-label">✓ {goodLabel}</div>
+        <div className="cmd-comparison-label">{goodLabel}</div>
         <div className="cmd-comparison-code">{goodCommand}</div>
         {goodNote && (
           <div

@@ -41,7 +41,7 @@ export function TestResult() {
                     color: "#86efac",
                   }}
                 >
-                  ✓ {t}
+                  {t}
                 </span>
               ))}
             </div>

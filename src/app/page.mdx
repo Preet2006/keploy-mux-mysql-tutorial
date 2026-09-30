@@ -1,5 +1,4 @@
 import { HeroFlow } from "@/components/HeroFlow";
-import { ArchitectureDiagram } from "@/components/ArchitectureDiagram";
 import { AnimatedFlow } from "@/components/AnimatedFlow";
 import { TestResult } from "@/components/TestResult";
 import { TestCaseCards } from "@/components/TestCaseCards";
@@ -10,7 +9,6 @@ import { ProgressTracker } from "@/components/ProgressTracker";
 import { Callout } from "@/components/Callout";
 import { Step } from "@/components/Step";
 import { CodeBlock } from "@/components/CodeBlock";
-import { CommandComparison } from "@/components/CommandComparison";
 import { InfoCard, InfoCardGrid } from "@/components/InfoCard";
 import { StatusCard } from "@/components/StatusCard";
 import { FileTree } from "@/components/FileTree";
@@ -19,8 +17,7 @@ import { FileTree } from "@/components/FileTree";
 
 <div className="hero">
   <div className="hero-eyebrow">
-    <span aria-hidden="true">🔴</span>
-    KEPLOY × GO — INTERACTIVE TUTORIAL
+    Keploy × Go — Interactive Tutorial
   </div>
 
   <div className="hero-title" role="heading" aria-level="1">
@@ -72,9 +69,9 @@ Here's what Keploy generates — two recording sessions, three test cases each:
         { name: "config.yaml", type: "file", comment: "Keploy config" },
         { name: "mappings.yaml", type: "file", comment: "DB state snapshots" },
         { name: "tests", type: "dir", children: [
-          { name: "get-all-1.yaml", type: "file", comment: "GET /links" },
-          { name: "get-links-by-id-1.yaml", type: "file", comment: "GET /links/{id}" },
-          { name: "post-create-1.yaml", type: "file", comment: "POST /links" },
+          { name: "get-all-1.yaml", type: "file", comment: "GET /all" },
+          { name: "get-links-by-id-1.yaml", type: "file", comment: "GET /links/{id} — redirect" },
+          { name: "post-create-1.yaml", type: "file", comment: "POST /create" },
         ]},
       ],
     },
@@ -103,27 +100,27 @@ Six test cases. Zero written by hand.
 
 <span id="why-keploy" style={{ scrollMarginTop: "5rem", display: "block", marginTop: "-5rem", paddingTop: "5rem", visibility: "hidden", pointerEvents: "none" }} aria-hidden="true" />
 
-<Callout type="tip" title="The Real Problem">
+<Callout type="tip" title="The Problem It Addresses">
   Writing integration tests for API endpoints is expensive. You need fixtures, mocks, DB state, and ongoing maintenance. Most teams skip it — and find bugs in production instead.
 </Callout>
 
-Keploy takes a fundamentally different approach. Instead of writing tests upfront, it **observes your running application** and turns real traffic into reusable, deterministic test cases automatically.
+Instead of writing tests upfront, Keploy **observes a running application** and turns real traffic into reusable, deterministic test cases.
 
 <BeforeAfter />
 
 <InfoCardGrid>
-  <InfoCard title="What Keploy captures" icon="📡">
+  <InfoCard title="What Keploy captures">
     HTTP request method, path, headers, and body — the exact shape of each real API call made against your server.
   </InfoCard>
-  <InfoCard title="What Keploy stores" icon="💾">
+  <InfoCard title="What Keploy stores">
     A YAML snapshot of the request, the response your app produced, and the state of all external dependencies.
   </InfoCard>
-  <InfoCard title="What Keploy replays" icon="▶️">
+  <InfoCard title="What Keploy replays">
     The same requests, with mocked dependencies — then asserts the responses match the recorded snapshots.
   </InfoCard>
 </InfoCardGrid>
 
-**The key insight:** Keploy doesn't mock your tests — it records reality. Test cases are grounded in actual behavior, not assumptions.
+Keploy records the application's actual request and dependency behavior, then replays that behavior during testing. Test cases are grounded in observed traffic rather than assumptions about what the API should do.
 
 ---
 
@@ -132,22 +129,22 @@ Keploy takes a fundamentally different approach. Instead of writing tests upfron
 <span id="prerequisites" style={{ scrollMarginTop: "5rem", display: "block", marginTop: "-5rem", paddingTop: "5rem", visibility: "hidden", pointerEvents: "none" }} aria-hidden="true" />
 
 <InfoCardGrid>
-  <InfoCard title="Go 1.21+" icon="🐹">
+  <InfoCard title="Go 1.21+">
     Install from <a href="https://go.dev/dl" target="_blank" rel="noopener noreferrer">go.dev/dl</a>.
   </InfoCard>
-  <InfoCard title="Docker + Docker Compose" icon="🐳">
-    MySQL runs in a container. Docker Desktop works on macOS/Windows.
+  <InfoCard title="Docker">
+    MySQL runs in a container via <code>docker run</code> — no Docker Compose file needed for this sample. Docker Desktop works on macOS/Windows.
   </InfoCard>
-  <InfoCard title="Keploy CLI" icon="🔴">
+  <InfoCard title="Keploy CLI">
     Install from <a href="https://keploy.io/docs/server/installation" target="_blank" rel="noopener noreferrer">keploy.io/docs</a>. Used version: 3.8.47.
   </InfoCard>
-  <InfoCard title="curl or HTTP client" icon="⚡">
+  <InfoCard title="curl or HTTP client">
     For sending test requests. <code>curl</code>, Postman, or <code>httpie</code> all work.
   </InfoCard>
 </InfoCardGrid>
 
 <Callout type="info" title="Platform Note">
-  These steps ran on Linux/macOS. On Windows, use WSL2. The Keploy CLI currently works best on Linux natively.
+  This walkthrough was run on Linux. Keploy's installation and supported platforms have changed across releases — check the <a href="https://keploy.io/docs/server/installation" target="_blank" rel="noopener noreferrer">installation docs</a> for the current setup path on macOS or Windows rather than relying on this page for that.
 </Callout>
 
 ---
@@ -169,34 +166,40 @@ cd samples-go/mux-mysql`}
   "# cd samples-go/mux-mysql",
 ]} />
 
-The `mux-mysql` app is a URL shortener with three endpoints — exactly the three test cases we'll record.
+The `mux-mysql` app is a URL shortener with three endpoints — exactly the three test cases we'll record. The sample's own repository doesn't ship a `docker-compose.yml`; it starts MySQL with a plain `docker run`, so that's what this walkthrough uses too.
 
 </Step>
 
-<Step number="2" title="Start MySQL with Docker Compose">
+<Step number="2" title="Start MySQL">
 
 <CodeBlock language="bash">
-{`docker compose up -d`}
+{`docker run -p 3306:3306 --rm --name mysql \\
+  -e MYSQL_ROOT_PASSWORD=my-secret-pw \\
+  -d mysql:latest`}
 </CodeBlock>
 
-<Callout type="info" title="docker-compose vs docker compose">
-  Newer Docker versions use <code>docker compose</code> (without hyphen) as a built-in plugin. If you have the older standalone binary, use <code>docker-compose</code> instead. Both commands are equivalent here.
-</Callout>
-
-<Callout type="tip" title="Why Docker Compose?">
-  The app needs MySQL at a specific host/port. Docker Compose handles this without manual installation. Keploy will capture the exact DB queries your app makes — and replay them as mocked responses later.
+<Callout type="tip" title="Why a container for MySQL?">
+  The app needs MySQL reachable at a specific host/port without a manual install. Keploy will capture the exact DB queries the app makes against it — and replay them as mocked responses later, so this container never needs to be touched during replay.
 </Callout>
 
 <CodeBlock language="bash">
 {`# Wait for MySQL to finish initializing
-docker compose logs -f db`}
+docker logs -f mysql`}
 </CodeBlock>
 
 <ExpectedOutput lines={[
   "… [MySQL initializing]",
-  "✓ ready for connections",
+  "… ready for connections",
   "# Press Ctrl+C to stop following logs",
 ]} label="Representative output" />
+
+<Callout type="info" title="Connection string">
+  The app reads its MySQL connection details from a single environment variable — no fallback, it exits if this is unset.
+</Callout>
+
+<CodeBlock language="bash">
+{`export ConnectionString="root:my-secret-pw@tcp(localhost:3306)/mysql"`}
+</CodeBlock>
 
 </Step>
 
@@ -213,7 +216,7 @@ go build -o mux-mysql .`}
   "# No output on success — the binary is ready",
 ]} label="Expected (no output on success)" />
 
-A successful build confirms all imports resolve before adding Keploy to the mix.
+A successful build confirms all imports resolve before adding Keploy to the mix. (The sample's own instructions build to `./main`; this walkthrough just names the binary `mux-mysql` — either name works with `go build -o`.)
 
 </Step>
 
@@ -221,12 +224,12 @@ A successful build confirms all imports resolve before adding Keploy to the mix.
 
 <CodeBlock language="go">
 {`// main.go — three routes, three test cases
-r.HandleFunc("/links", createLink).Methods("POST")
-r.HandleFunc("/links", getAllLinks).Methods("GET")
-r.HandleFunc("/links/{id}", getLinkByID).Methods("GET")`}
+router.HandleFunc("/create", controller.CreateLink(store)).Methods("POST")
+router.HandleFunc("/all", controller.GetAllLinksFromWebsite(store)).Methods("GET")
+router.HandleFunc("/links/{id}", controller.RedirectUser(store)).Methods("GET")`}
 </CodeBlock>
 
-Each handler talks to MySQL. Keploy will sit between the app and the database, capturing both the HTTP and the DB interaction.
+Each handler talks to MySQL. `RedirectUser` is worth noting — it doesn't return JSON, it looks up the stored URL and issues an HTTP redirect to it. Keploy sits between the app and the database, capturing both the HTTP and the DB interaction regardless of which shape the response takes.
 
 </Step>
 
@@ -262,35 +265,40 @@ With the app recording, use curl to make real API calls. Each request becomes a 
 
 <CodeBlock language="bash">
 {`# 1 — Create a new link
-curl -s -X POST http://localhost:8080/links \
+curl -s -X POST http://localhost:8080/create \
   -H "Content-Type: application/json" \
-  -d '{"url": "https://keploy.io", "custom": "keploy"}'`}
+  -d '{"link": "https://keploy.io"}'`}
 </CodeBlock>
 
 <ExpectedOutput lines={[
-  '{"id":1,"url":"https://keploy.io","custom":"keploy"}',
+  '{"message":"Converted","link":"http://localhost:8080/links/1","status":true}',
   "# Keploy records this request in the background",
-]} label="curl response" />
+]} label="Representative response — matches the app's response shape" />
 
 <CodeBlock language="bash">
 {`# 2 — Fetch all links
-curl -s http://localhost:8080/links`}
+curl -s http://localhost:8080/all`}
 </CodeBlock>
 
 <ExpectedOutput lines={[
-  '[{"id":1,"url":"https://keploy.io","custom":"keploy"}]',
+  '{"message":[{"id":"1","website":"https://keploy.io"}],"status":true}',
   "# Keploy records this request in the background",
-]} label="curl response" />
+]} label="Representative response — matches the app's response shape" />
 
 <CodeBlock language="bash">
 {`# 3 — Fetch a specific link by ID
-curl -s http://localhost:8080/links/1`}
+curl -s -i http://localhost:8080/links/1`}
 </CodeBlock>
 
 <ExpectedOutput lines={[
-  '{"id":1,"url":"https://keploy.io","custom":"keploy"}',
-  "# Keploy records this request in the background",
-]} label="curl response" />
+  "HTTP/1.1 307 Temporary Redirect",
+  "Location: https://keploy.io",
+  "# This route redirects rather than returning JSON — the -i flag shows the headers",
+]} label="Representative response — matches the app's response shape" />
+
+<Callout type="warning" title="Not a JSON endpoint">
+  Unlike the other two routes, <code>GET /links/{"{"}id{"}"}</code> is a redirect handler. It responds with <code>307 Temporary Redirect</code> and a <code>Location</code> header pointing at the original URL — there's no JSON body to inspect. Keploy still records this correctly; the generated test case just asserts the status code and header instead of a body.
+</Callout>
 
 </Step>
 
@@ -310,7 +318,7 @@ Press `Ctrl+C` to stop. Keploy writes the session to disk.
 
 <span id="what-keploy-captured" style={{ scrollMarginTop: "5rem", display: "block", marginTop: "-5rem", paddingTop: "5rem", visibility: "hidden", pointerEvents: "none" }} aria-hidden="true" />
 
-Let's look at what Keploy wrote to disk — the `get-all-1.yaml` test case:
+Here's the shape of what Keploy writes to disk for the `get-all-1.yaml` test case. The structure below (top-level keys, `req`/`resp` split, `assertions.noise`) reflects Keploy's documented test format — treat the exact field layout as **representative**, since a generated file can vary slightly by Keploy version:
 
 <CodeBlock language="yaml" filename="keploy/test-set-0/tests/get-all-1.yaml">
 {`version: api.keploy.io/v1beta1
@@ -322,7 +330,7 @@ spec:
     method: GET
     proto_major: 1
     proto_minor: 1
-    url: http://localhost:8080/links
+    url: http://localhost:8080/all
     header:
       User-Agent: curl/7.88.1
       Accept: "*/*"
@@ -332,7 +340,7 @@ spec:
     header:
       Content-Type: application/json
     body: |
-      [{"id":1,"url":"https://keploy.io","custom":"keploy"}]
+      {"message":[{"id":"1","website":"https://keploy.io"}],"status":true}
   objects: []
   assertions:
     noise:
@@ -343,7 +351,7 @@ spec:
   The <code>req</code> block is what Keploy replays. The <code>resp</code> block is the expected output your app must match. The <code>assertions.noise</code> field tells Keploy to ignore <code>header.Date</code> — it changes on every request and would cause false failures.
 </Callout>
 
-And the `mappings.yaml` that stubs the database:
+And the `mappings.yaml` that stubs the database — again, representative of the structure rather than a guaranteed byte-for-byte schema:
 
 <CodeBlock language="yaml" filename="keploy/test-set-0/mappings.yaml">
 {`version: api.keploy.io/v1beta1
@@ -358,7 +366,7 @@ spec:
         host: localhost
         port: "3306"
         user: root
-        dbName: keploy`}
+        dbName: mysql`}
 </CodeBlock>
 
 ---
@@ -381,8 +389,8 @@ The `mappings.yaml` records the state of external dependencies at recording time
 
 This makes tests deterministic: they pass regardless of whether your database has the same data or even exists.
 
-<Callout type="tip" title="This Is the Real Superpower">
-  Keploy eliminates fixture management entirely. The mappings handle database state automatically — no seeding, no resetting, no manual state setup.
+<Callout type="tip" title="Why mappings matter">
+  This is what removes fixture management from the test loop: no seeding, no resetting, no manual state setup. The mapping file, not your database, is the source of truth during replay.
 </Callout>
 
 ---
@@ -403,7 +411,7 @@ The `--delay 10` flag gives your app 10 seconds to start before Keploy begins re
   "… Starting ./mux-mysql",
   "… Replaying test-set-0 (3 tests)",
   "… Replaying test-set-1 (3 tests)",
-  "✓ 6/6 tests passed",
+  "6/6 tests passed",
 ]} label="Representative Keploy output" />
 
 </Step>
@@ -464,8 +472,8 @@ Real issues I hit — and how to diagnose them:
 <TroubleshootCard item={{
   problem: "Tests fail: response body doesn't match",
   reason: "You're replaying tests against a database that already has data from a previous run — so auto-generated IDs don't match.",
-  command: "docker-compose down -v\ndocker-compose up -d",
-  expected: "✓ Container removed\n✓ Fresh MySQL started",
+  command: "docker rm -f mysql\ndocker run -p 3306:3306 --rm --name mysql -e MYSQL_ROOT_PASSWORD=my-secret-pw -d mysql:latest",
+  expected: "The old container is removed, then a fresh MySQL instance starts with no prior data.",
   next: "Re-run keploy record to capture tests against the clean database state."
 }} />
 
@@ -473,15 +481,15 @@ Real issues I hit — and how to diagnose them:
   problem: "App doesn't start during keploy test",
   reason: "The --delay value is too short for your app's startup time.",
   command: "keploy test -c \"./mux-mysql\" --delay 20",
-  expected: "✓ Application started\n● Replaying tests…",
+  expected: "The app finishes starting before Keploy begins replaying requests against it.",
   next: "Increase --delay in increments until the app reliably starts before replay begins."
 }} />
 
 <TroubleshootCard item={{
   problem: "MySQL container not ready when app starts",
   reason: "MySQL takes several seconds to initialize. Starting the app too quickly results in connection errors.",
-  command: "docker-compose logs db | grep \"ready for connections\"",
-  expected: "✓ ready for connections",
+  command: "docker logs mysql | grep \"ready for connections\"",
+  expected: "The log line \"ready for connections\" appears once MySQL has finished initializing.",
   next: "Wait for the ready message before starting the app or Keploy."
 }} />
 
@@ -491,24 +499,24 @@ Real issues I hit — and how to diagnose them:
 
 <span id="what-i-learned" style={{ scrollMarginTop: "5rem", display: "block", marginTop: "-5rem", paddingTop: "5rem", visibility: "hidden", pointerEvents: "none" }} aria-hidden="true" />
 
-Running this quickstart genuinely changed how I think about integration testing. Honest takeaways:
+Notes from actually running this end to end:
 
 <InfoCardGrid>
-  <InfoCard title="Tests from reality, not assumptions" icon="💡">
-    Writing tests based on what you <em>think</em> the API does is risky. Recording what it <em>actually</em> does is grounded in truth. Keploy makes this distinction automatic.
+  <InfoCard title="Tests reflect observed behavior, not assumed behavior">
+    Writing tests based on what you think the API does is a guess. Recording what it actually does removes that guesswork — the assertions come from a real response, not a spec.
   </InfoCard>
-  <InfoCard title="Mappings solve the hard problem" icon="🗺️">
-    Managing database state in integration tests is notoriously painful. The mappings system sidesteps it entirely — and it works.
+  <InfoCard title="Mappings replace fixture management">
+    Managing database state across test runs is normally the painful part of integration testing. Here, the mapping file stands in for the database at replay time, so there's nothing to seed or reset.
   </InfoCard>
-  <InfoCard title="CLI version matters" icon="⚙️">
-    Always run <code>keploy --help</code> when a command fails. The CLI evolves fast and docs sometimes lag. Work from what the installed CLI actually exposes.
+  <InfoCard title="Check --help against the installed CLI version">
+    One command from the docs didn't exist in 3.8.47. Running <code>keploy --help</code> settled it immediately — worth doing first whenever a command fails, since CLI and docs can drift.
   </InfoCard>
-  <InfoCard title="Test sets = isolated states" icon="📁">
-    Each <code>keploy record</code> run is a new test set. You can capture different states — empty DB, populated DB, error paths — as separate baselines.
+  <InfoCard title="Each recording is an isolated test set">
+    Every <code>keploy record</code> run creates a new test set. That means you can capture different states — empty DB, populated DB, error paths — as separate baselines without them interfering.
   </InfoCard>
 </InfoCardGrid>
 
-The broader lesson: Keploy isn't magic, but it's genuinely useful. It's best for teams with working APIs and weak test coverage — it gives you a solid regression baseline quickly, grounded in real behavior.
+Where this fits: it's a fast way to get regression coverage on an API that already works, without hand-writing fixtures. It doesn't replace thinking about edge cases or writing tests for behavior that hasn't happened yet — it only knows what it's seen recorded.
 
 ---
 
@@ -517,16 +525,16 @@ The broader lesson: Keploy isn't magic, but it's genuinely useful. It's best for
 <span id="next-steps" style={{ scrollMarginTop: "5rem", display: "block", marginTop: "-5rem", paddingTop: "5rem", visibility: "hidden", pointerEvents: "none" }} aria-hidden="true" />
 
 <InfoCardGrid>
-  <InfoCard title="Try your own Go service" icon="🚀">
-    Run <code>keploy record</code> against any Go API you're working on. You'll be surprised by how much implicit behavior gets captured.
+  <InfoCard title="Try it on your own Go service">
+    Run <code>keploy record</code> against any Go API you're working on and see what it captures compared to what you'd expect.
   </InfoCard>
-  <InfoCard title="Add to CI" icon="🔄">
+  <InfoCard title="Add it to CI">
     Keploy test cases are YAML files — they commit to git. Run <code>keploy test</code> in CI to catch regressions automatically on every PR.
   </InfoCard>
-  <InfoCard title="Read the generated YAML" icon="📄">
+  <InfoCard title="Read the generated YAML">
     Spend 10 minutes reading <code>keploy/test-set-0/tests/*.yaml</code>. Understanding the format helps you debug failures and manually adjust assertions.
   </InfoCard>
-  <InfoCard title="Multiple recording sessions" icon="📁">
+  <InfoCard title="Record multiple sessions">
     Capture the same endpoints in different states — empty DB, populated DB, auth failures. Each session becomes its own baseline.
   </InfoCard>
 </InfoCardGrid>
@@ -542,11 +550,11 @@ The broader lesson: Keploy isn't magic, but it's genuinely useful. It's best for
 
 ### Keploy Workflow — Interactive Diagram
 
-The complete Keploy flow. Press **▶ Run** to animate it:
+The complete Keploy flow. Press **Run** to step through it:
 
 <AnimatedFlow />
 
-The story, simply: **real API traffic becomes durable, deterministic automated tests.** No test code to write. No fixture management. Just run your app, send real requests, and let Keploy do the rest.
+Summarized: real API traffic becomes durable, deterministic automated tests. No test code to write, no fixtures to manage — just run the app, send real requests, and record what happens.
 
 ---
 

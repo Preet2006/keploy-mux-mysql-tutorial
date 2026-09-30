@@ -47,7 +47,7 @@ export function BeforeAfter() {
             marginBottom: "1rem",
           }}
         >
-          ✗ Without Keploy
+          Without Keploy
         </div>
         <div style={{ display: "flex", flexDirection: "column", gap: "0.625rem" }}>
           {before.map((item, i) => (
@@ -104,7 +104,7 @@ export function BeforeAfter() {
             marginBottom: "1rem",
           }}
         >
-          ✓ With Keploy
+          With Keploy
         </div>
         <div style={{ display: "flex", flexDirection: "column", gap: "0.625rem" }}>
           {after.map((item, i) => (
