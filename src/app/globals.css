@@ -61,8 +61,8 @@
 
   /* Sidebar */
   --sidebar-width: 260px;
-  --toc-width: 220px;
-  --content-max: 720px;
+  --toc-width: 200px;
+  --content-max: 740px;
 
   /* Transitions */
   --transition-fast: 150ms ease;
@@ -893,7 +893,7 @@ body {
 .file-tree-indent { display: inline-block; margin-left: 1.5rem; }
 
 /* ============================================
-   TOC
+   CONTEXT PANEL (right rail)
    ============================================ */
 
 .toc-title {
@@ -903,29 +903,6 @@ body {
   text-transform: uppercase;
   color: var(--text-muted);
   margin-bottom: 0.75rem;
-}
-
-.toc-item {
-  display: block;
-  padding: 0.3125rem 0.625rem;
-  border-radius: var(--radius-sm);
-  font-size: 0.8125rem;
-  color: var(--text-secondary);
-  text-decoration: none;
-  transition: all var(--transition-fast);
-  border-left: 2px solid transparent;
-  line-height: 1.4;
-}
-
-.toc-item:hover {
-  color: var(--text-primary);
-  background: var(--bg-elevated);
-}
-
-.toc-item.active {
-  color: var(--keploy-orange);
-  border-left-color: var(--keploy-orange);
-  background: var(--keploy-glow);
 }
 
 /* ============================================
@@ -1005,6 +982,16 @@ body {
 /* ============================================
    RESPONSIVE
    ============================================ */
+
+/* Wider column on large screens so content doesn't sit lost in empty
+   space once the right rail is just a slim context panel. */
+@media (min-width: 1440px) {
+  :root { --content-max: 800px; }
+}
+
+@media (min-width: 1920px) {
+  :root { --content-max: 840px; }
+}
 
 @media (max-width: 1280px) {
   .doc-toc { display: none; }

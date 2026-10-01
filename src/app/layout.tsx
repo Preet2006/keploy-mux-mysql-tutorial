@@ -2,7 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { Sidebar } from "@/components/Sidebar";
-import { TableOfContents } from "@/components/TableOfContents";
+import { ContextPanel } from "@/components/ContextPanel";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { MobileMenu } from "@/components/MobileMenu";
 
@@ -136,40 +136,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             </article>
           </main>
 
-          {/* Right TOC */}
+          {/* Right rail — passive context, not a second nav */}
           <aside className="doc-toc">
-            <TableOfContents />
-
-            {/* Right panel — run metadata */}
-            <div style={{ marginTop: "2rem" }}>
-              <div
-                style={{
-                  fontSize: "0.6875rem",
-                  fontWeight: 700,
-                  letterSpacing: "0.1em",
-                  textTransform: "uppercase",
-                  color: "var(--text-muted)",
-                  marginBottom: "0.625rem",
-                }}
-              >
-                This Run
-              </div>
-              <div
-                style={{
-                  fontSize: "0.8125rem",
-                  color: "var(--color-success)",
-                  fontWeight: 600,
-                  marginBottom: "0.5rem",
-                }}
-              >
-                6/6 tests passed
-              </div>
-              <div style={{ fontSize: "0.8125rem", color: "var(--text-secondary)", lineHeight: 1.8 }}>
-                Keploy 3.8.47<br />
-                mux-mysql sample<br />
-                Go
-              </div>
-            </div>
+            <ContextPanel />
           </aside>
         </div>
       </body>
